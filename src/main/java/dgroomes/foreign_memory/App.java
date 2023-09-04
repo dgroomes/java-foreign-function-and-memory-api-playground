@@ -98,7 +98,7 @@ public class App {
                 } catch (Throwable e) {
                     throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
                 }
-                var name = classNameSegment.getUtf8String(i);
+                var name = classNameSegment.getUtf8String(0);
                 var numberOfFields = (short) numberOfFieldsHandle.get(segment, i);
                 var numberOfMethods = (short) numberOfMethodsHandle.get(segment, i);
                 log.info("  name: {}, numberOfFields: {}, numberOfMethods: {}", name, numberOfFields, numberOfMethods);
