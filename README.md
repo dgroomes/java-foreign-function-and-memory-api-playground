@@ -1,4 +1,4 @@
-# java-foreign-function-and-memory-api
+# java-foreign-function-and-memory-api-playground
 
 📚 Learning and exploring "off-heap" memory segments using Java's foreign memory API.
 
@@ -29,7 +29,7 @@ Follow these instructions to build and run the program.
 3. Switch to Java 21
 4. Run the program:
    * ```shell
-     build/install/foreign-memory/bin/foreign-memory
+     build/install/java-foreign-function-and-memory-api-playground/bin/java-foreign-function-and-memory-api-playground
      ```
 
 
