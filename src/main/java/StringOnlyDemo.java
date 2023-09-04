@@ -30,7 +30,7 @@ public class StringOnlyDemo {
             var messageLayout = MemoryLayout.sequenceLayout(6, ValueLayout.JAVA_BYTE).withName("message");
             SequenceLayout messagesLayout = MemoryLayout.sequenceLayout(elementCount, messageLayout).withName("messagesSequenceLayout");
 
-            MethodHandle messageHandle = messagesLayout.sliceHandle(
+            MethodHandle messageSequenceHandler = messagesLayout.sliceHandle(
                     PathElement.sequenceElement());
 
             System.out.println("Let's create a memory segment and write to it...");
@@ -38,20 +38,17 @@ public class StringOnlyDemo {
             for (int i = 0; i < fiveCharacterAsciiMessages.size(); i++) {
                 var message = fiveCharacterAsciiMessages.get(i);
                 System.out.printf("Writing message: %s%n", message);
-                MemorySegment messageSegment = (MemorySegment) messageHandle.invoke(segment, i);
+                MemorySegment messageSegment = (MemorySegment) messageSequenceHandler.invoke(segment, i);
                 messageSegment.setUtf8String(0, message);
             }
 
             System.out.println("Let's read the data back from the memory segment...");
             for (int i = 0; i < elementCount; i++) {
-                MemorySegment classNameSegment;
-                classNameSegment = (MemorySegment) messageHandle.invoke(segment, i);
-                var message = classNameSegment.getUtf8String(i);
+                MemorySegment messageSegment;
+                messageSegment = (MemorySegment) messageSequenceHandler.invoke(segment, i);
+                var message = messageSegment.getUtf8String(0);
                 System.out.println(message);
             }
         }
     }
 }
-
-
-
