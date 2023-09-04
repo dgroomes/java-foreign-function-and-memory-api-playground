@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.foreign.*;
 import java.lang.foreign.MemoryLayout.PathElement;
-//import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class App {
             SequenceLayout classInfoSequenceLayout;
             {
                 StructLayout classInfoStructLayout = MemoryLayout.structLayout(
-                        MemoryLayout.sequenceLayout(16, ValueLayout.JAVA_BYTE).withName("name"), // maybe this should be an address? Strugging. Can't get a varhandle to a sequence.
+                        MemoryLayout.sequenceLayout(32, ValueLayout.JAVA_BYTE).withName("name"), // maybe this should be an address? Strugging. Can't get a varhandle to a sequence.
                         ValueLayout.JAVA_SHORT.withName("numberOfFields"),
                         ValueLayout.JAVA_SHORT.withName("numberOfMethods")).withName("classInfoStructLayout");
 
@@ -41,7 +41,7 @@ public class App {
             }
 
             // Get a VarHandle for the fields.
-//            MethodHandle nameHandle;
+            MethodHandle nameHandle;
             VarHandle numberOfFieldsHandle;
             VarHandle numberOfMethodsHandle;
             {
@@ -54,11 +54,10 @@ public class App {
                 // And then client code can maybe use some "copy" method of the FFM API to copy in the bytes? I'll re-use
                 // some local byte array to not do any allocations?
 //                nameHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.sequenceElement() PathElement.groupElement("name"));
-                // TODO This needs to be sequence-within-sequence path... I think? Idk the variable width stuff is hard.
-                // I need an understanding of the fixed width stuff first.
-//                nameHandle = classInfoSequenceLayout.sliceHandle(
-//                        PathElement.sequenceElement(),
-//                        PathElement.groupElement("name"));
+                // TODO This needs to be sequence-within-sequence path... I think?
+                nameHandle = classInfoSequenceLayout.sliceHandle(
+                        PathElement.sequenceElement(),
+                        PathElement.groupElement("name"));
 
                 numberOfFieldsHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.groupElement("numberOfFields"));
                 numberOfMethodsHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.groupElement("numberOfMethods"));
@@ -70,17 +69,20 @@ public class App {
                 segment = arena.allocate(classInfoSequenceLayout);
                 for (int i = 0; i < classInfoList.size(); i++) {
                     ClassScanner.ClassInfo classInfo = classInfoList.get(i);
-//                    String className = classInfo.className();
-//                    // Note: the class name is truncated to 15 bytes because the 16th bit is reserved for the null
-//                    // terminator (I think).
-//                    String classNameTruncated = StringUtil.getLimitedByteString(className, 15);
-//                    MemorySegment classNameSegment;
-//                    try {
-//                        classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
-//                    } catch (Throwable e) {
-//                        throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
-//                    }
-//                    classNameSegment.setUtf8String(0, classNameTruncated);
+
+                    log.info("Writing: {}", classInfo);
+
+                    String className = classInfo.className();
+                    // Note: the class name is truncated to 31 bytes because the 16th bit is reserved for the null
+                    // terminator (I think).
+                    String classNameTruncated = StringUtil.getLimitedByteString(className, 31);
+                    MemorySegment classNameSegment;
+                    try {
+                        classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
+                    } catch (Throwable e) {
+                        throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
+                    }
+                    classNameSegment.setUtf8String(0, classNameTruncated);
 
                     numberOfFieldsHandle.set(segment, (long) i, (short) classInfo.fieldNames().size());
                     numberOfMethodsHandle.set(segment, (long) i, (short) classInfo.methodNames().size());
@@ -90,17 +92,16 @@ public class App {
             // Read a sample of class infos from the memory segment.
             log.info("Sample data: ");
             for (int i = 0; i < elementCount; i++) {
-//                MemorySegment classNameSegment;
-//                try {
-//                    classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
-//                } catch (Throwable e) {
-//                    throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
-//                }
-//                var name = classNameSegment.getUtf8String(i);
+                MemorySegment classNameSegment;
+                try {
+                    classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
+                }
+                var name = classNameSegment.getUtf8String(i);
                 var numberOfFields = (short) numberOfFieldsHandle.get(segment, i);
                 var numberOfMethods = (short) numberOfMethodsHandle.get(segment, i);
-//                log.info("  name: {}, numberOfFields: {}, numberOfMethods: {}", name, numberOfFields, numberOfMethods);
-                log.info("  numberOfFields: {}, numberOfMethods: {}", numberOfFields, numberOfMethods);
+                log.info("  name: {}, numberOfFields: {}, numberOfMethods: {}", name, numberOfFields, numberOfMethods);
             }
         }
     }
