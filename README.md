@@ -11,8 +11,6 @@ a preview feature in Java 21 and is expected to be finalized soon thereafter. I 
 In this project, we'll build a simple program that writes data (what kind of data should we pick?) into foreign segments
 of memory and then searches it and summarizes it. (Maybe just a byte count?)
 
-Note: I moved this from my other repository: <https://github.com/dgroomes/jdk-playground/>. I'll delete this note soon.
-
 
 ## Instructions
 
@@ -49,7 +47,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
   memory. Also, this is more interesting because strings are variable length, and we would engage different parts of the
   API.
   * DONE Enumerate classes and their fields and methods.
-  * IN PROGRESS Serialize and write fixed-width "class info" data. Write a truncated class name (16 bytes) instead of the
+  * DONE Serialize and write fixed-width "class info" data. Write a truncated class name (16 bytes) instead of the
     hash and write the number of fields and number of methods. This keeps us in the easier territory of "fixed width"
     instead of "variable width" data but gets us much deeper into the FFM API. UPDATE: I'm committing this is in a
     semi-working state for now. I'm able to write and read a string (the class name) but with a defect. The output
@@ -68,7 +66,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
     14:12:06.594 [main] INFO dgroomes.foreign_memory.App -   name: f.JRSUI, numberOfFields: 0, numberOfMethods: 0
     14:12:06.594 [main] INFO dgroomes.foreign_memory.App -   name: .JRSUI, numberOfFields: 0, numberOfMethods: 0
     ```
-  * IN PROGRESS Read from the fixed-width "class info" data. This is where the MemoryLayout should be really helpful.
+  * DONE Read from the fixed-width "class info" data. This is where the MemoryLayout should be really helpful.
   * Figure out a plan for variable sized chunks. The names related to a "class info" are variable. Some classes have many
     fields, and some have few. Some classes have long-winded field names and method names, and some have terse names.
     How do we physically lay out this data with the FFM API? I don't think we can express variable width data using the

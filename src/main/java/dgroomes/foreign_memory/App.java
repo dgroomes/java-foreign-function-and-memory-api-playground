@@ -15,21 +15,29 @@ import java.util.List;
 public class App {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
+    public static final int SAMPLE_READ_COUNT = 30;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         log.info("Let's explore the Java foreign memory API!");
         new App().run();
     }
 
-    public void run() {
+    public void run() throws Throwable {
         // An arena is like a managed container of off-heap memory. It will be automatically freed after the try block
         // ends thanks to the 'try-with-resources' statement.
         try (Arena arena = Arena.ofConfined()) {
-            List<ClassScanner.ClassInfo> classInfoList = ClassScanner.scanClasses().subList(20, 30); // Limit to a small subset for sanity/demo
+
+            // Fetch the source domain data.
+            List<ClassScanner.ClassInfo> classInfoList = ClassScanner.scanClasses();
             int elementCount = classInfoList.size();
 
-            // Define the memory layout of the "class info" data structure. This is fixed width. We don't actually
-            // store the class fields and methods here because those are variable. We have to figure that out later.
+            // Define the domain data structures in terms of MemoryLayout objects. MemoryLayout is a core component of
+            // the Foreign Memory API.
+            //
+            // Specifically, we define a sequence of "class info" structs. Notice how we have the option of using
+            // structs in Java (well by way of some indirection). This option is a great luxury! By necessity, the
+            // index is fixed width. Later we will create a big memory segment to store the class fields and methods
+            // because those are variable width. We have to figure that out later.
             SequenceLayout classInfoSequenceLayout;
             {
                 StructLayout classInfoStructLayout = MemoryLayout.structLayout(
@@ -40,21 +48,11 @@ public class App {
                 classInfoSequenceLayout = MemoryLayout.sequenceLayout(elementCount, classInfoStructLayout).withName("classInfoSequenceLayout");
             }
 
-            // Get a VarHandle for the fields.
+            // Get "accessor" objects for the data. These are VarHandles and MethodHandles.
             MethodHandle nameHandle;
             VarHandle numberOfFieldsHandle;
             VarHandle numberOfMethodsHandle;
             {
-                // You can't get a VarHandle on a sequence, like a sequence of BYTE value layouts like I'm trying to do
-                // with the following commented out line. I get the following error:
-                //
-                //   java.lang.IllegalArgumentException: Path does not select a value layout
-                //
-                // I think I need a MethodHandle that can produce the byte offset for the first byte in the sequence.
-                // And then client code can maybe use some "copy" method of the FFM API to copy in the bytes? I'll re-use
-                // some local byte array to not do any allocations?
-//                nameHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.sequenceElement() PathElement.groupElement("name"));
-                // TODO This needs to be sequence-within-sequence path... I think?
                 nameHandle = classInfoSequenceLayout.sliceHandle(
                         PathElement.sequenceElement(),
                         PathElement.groupElement("name"));
@@ -63,44 +61,41 @@ public class App {
                 numberOfMethodsHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.groupElement("numberOfMethods"));
             }
 
-            // Populate the "class info" structs.
+            // Write the data.
+            log.info("Let's write the data to a memory segment...");
             MemorySegment segment;
             {
                 segment = arena.allocate(classInfoSequenceLayout);
                 for (int i = 0; i < classInfoList.size(); i++) {
-                    ClassScanner.ClassInfo classInfo = classInfoList.get(i);
+                    var classInfo = classInfoList.get(i);
 
-                    log.info("Writing: {}", classInfo);
-
-                    String className = classInfo.className();
-                    // Note: the class name is truncated to 31 bytes because the 16th bit is reserved for the null
-                    // terminator (I think).
-                    String classNameTruncated = StringUtil.getLimitedByteString(className, 31);
-                    MemorySegment classNameSegment;
-                    try {
-                        classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
-                    } catch (Throwable e) {
-                        throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
+                    String classNameTruncated;
+                    {
+                        var className = classInfo.className();
+                        // Note: the class name is truncated to 31 bytes because the 32th bit is reserved for the null
+                        // terminator.
+                        classNameTruncated = StringUtil.getLimitedByteString(className, 31);
                     }
+
+                    var classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
                     classNameSegment.setUtf8String(0, classNameTruncated);
 
                     numberOfFieldsHandle.set(segment, (long) i, (short) classInfo.fieldNames().size());
                     numberOfMethodsHandle.set(segment, (long) i, (short) classInfo.methodNames().size());
                 }
             }
+            log.info("Done. Wrote {} elements to the memory segment", elementCount);
+            log.info("");
 
-            // Read a sample of class infos from the memory segment.
-            log.info("Sample data: ");
-            for (int i = 0; i < elementCount; i++) {
-                MemorySegment classNameSegment;
-                try {
-                    classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
-                } catch (Throwable e) {
-                    throw new RuntimeException("Failed to invoke the method handle for the classname. This is almost definitely because I don't understand the API yet", e);
-                }
+            log.info("Let's read a sample of the data back out of the memory segment...");
+            for (int baseIndex = 0, multipliedIndex = baseIndex;
+                 baseIndex < SAMPLE_READ_COUNT && multipliedIndex < elementCount;
+                 baseIndex++, multipliedIndex = baseIndex * 200) {
+
+                var classNameSegment = (MemorySegment) nameHandle.invoke(segment, multipliedIndex);
                 var name = classNameSegment.getUtf8String(0);
-                var numberOfFields = (short) numberOfFieldsHandle.get(segment, i);
-                var numberOfMethods = (short) numberOfMethodsHandle.get(segment, i);
+                var numberOfFields = (short) numberOfFieldsHandle.get(segment, multipliedIndex);
+                var numberOfMethods = (short) numberOfMethodsHandle.get(segment, multipliedIndex);
                 log.info("  name: {}, numberOfFields: {}, numberOfMethods: {}", name, numberOfFields, numberOfMethods);
             }
         }
