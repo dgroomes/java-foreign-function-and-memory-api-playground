@@ -18,14 +18,13 @@ import java.util.List;
  *
  * The program output is the following:
  * <pre>
- *     Allocated 32 bytes of memory.
+ *     Allocated 28 bytes of memory.
  *     Writing entry 0 at offset 0
  *     Writing entry 1 at offset 8
- *     Writing entry 2 at offset 19
- *     bytes: 32
+ *     Writing entry 2 at offset 17
  *     ID: 0, Name: C
- *     ID: 1, Name: Java
- *     ID: 2, Name: Python
+ *     ID: 1, Name: Go
+ *     ID: 2, Name: Java
  * </pre>
  */
 public class OffsetArithmeticForMemoryLayoutsDemo {
@@ -33,15 +32,15 @@ public class OffsetArithmeticForMemoryLayoutsDemo {
 
     private static final List<String> PROGRAMMING_LANGUAGE_NAMES = List.of(
             "C",
-            "Java",
-            "Python");
+            "Go",
+            "Java");
     private final Arena arena;
 
     public OffsetArithmeticForMemoryLayoutsDemo(Arena arena) {
         this.arena = arena;
     }
 
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args) {
         try (Arena arena = Arena.ofConfined()) {
             new OffsetArithmeticForMemoryLayoutsDemo(arena).run();
         }
@@ -54,6 +53,10 @@ public class OffsetArithmeticForMemoryLayoutsDemo {
         // a memory layout element of type int, but we can't express a memory layout element of type text because
         // the names are variable width. So, let's express the length of the name as a memory layout element of type
         // short, and then use that to do some offset arithmetic to get to the next entry.
+        //
+        // But I've found I can't actually use this struct layout object and instead have to read and write at byte-granularity
+        // (at least it's still convenient to write string using the setUtf8String method; I need to look closer into
+        // that).
         var programmingLanguagesStruct = MemoryLayout.structLayout(
                 ValueLayout.JAVA_INT.withName("id"),
                 ValueLayout.JAVA_SHORT.withName("stringLength")).withName("programmingLanguages");
@@ -75,10 +78,8 @@ public class OffsetArithmeticForMemoryLayoutsDemo {
             totalBytesNeeded += bytesLength + 1; // +1 for the null terminator
         }
 
-        // Allocate the memory segment. Because we have a heterogeneous memory layout, we can only align on the lowest
-        // common denominator, which is a byte. I think this is the same as expressing no alignment at all.
-//        MemorySegment overallSegment = arena.allocate(totalBytesNeeded, ValueLayout.JAVA_BYTE.byteAlignment());
-        MemorySegment overallSegment = arena.allocate(totalBytesNeeded, 1);
+        // Allocate the memory segment.
+        MemorySegment overallSegment = arena.allocate(totalBytesNeeded);
         System.out.println("Allocated " + totalBytesNeeded + " bytes of memory.");
 
         // Write the data. We need to manually keep track of the offset. (Although I think maybe there is a way to
@@ -88,7 +89,7 @@ public class OffsetArithmeticForMemoryLayoutsDemo {
             System.out.println("Writing entry " + i + " at offset " + offset);
 
             // This is silly, but I'm just trying to get something working. There is a better way to do this.
-            // Also this is super fragile because I'm hard coding the endianness.
+            // Also, this is super fragile because I'm hard coding to little endianness.
             overallSegment.set(ValueLayout.JAVA_BYTE, offset++, (byte) i);
             overallSegment.set(ValueLayout.JAVA_BYTE, offset++, (byte) (i >> 8));
             overallSegment.set(ValueLayout.JAVA_BYTE, offset++, (byte) (i >> 16));
@@ -103,11 +104,11 @@ public class OffsetArithmeticForMemoryLayoutsDemo {
             offset += bytes.length + 1; // +1 for the null terminator
         }
 
-        // Read the whole memory segment as bytes
-        ByteBuffer byteBuffer = overallSegment.asByteBuffer();
-        byte[] bytes = new byte[byteBuffer.remaining()];
-        byteBuffer.get(bytes);
-        System.out.println("bytes: " + bytes.length);
+        // As needed for debugging, print the whole memory segment as formatted bytes
+//        ByteBuffer byteBuffer = overallSegment.asByteBuffer();
+//        byte[] bytes = new byte[byteBuffer.remaining()];
+//        byteBuffer.get(bytes);
+//        System.out.println("bytes: " + bytes.length);
         // Print out the bytes in a human-readable way.
 //        for (byte b : bytes) {
 //            System.out.printf("%02X ", b);
