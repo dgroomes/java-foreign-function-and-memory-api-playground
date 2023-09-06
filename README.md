@@ -67,7 +67,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
     14:12:06.594 [main] INFO dgroomes.foreign_memory.App -   name: .JRSUI, numberOfFields: 0, numberOfMethods: 0
     ```
   * DONE Read from the fixed-width "class info" data. This is where the MemoryLayout should be really helpful.
-  * Figure out a plan for variable sized chunks. The names related to a "class info" are variable. Some classes have many
+  * IN PROGRESS Figure out a plan for variable sized chunks. The names related to a "class info" are variable. Some classes have many
     fields, and some have few. Some classes have long-winded field names and method names, and some have terse names.
     How do we physically lay out this data with the FFM API? I don't think we can express variable width data using the
     "structured data" offerings of the FFM API like MemoryLayout. All MemoryLayout objects are fixed width. I think the
@@ -76,5 +76,18 @@ General clean-ups, TODOs and things I wish to implement for this project:
     variable width stuff, I see that there are methods like `java.lang.foreign.MemorySegment.setUtf8String`.
     We need to express "shape" in a serial way. We need to do stuff like have some front matter that says
     "here's the number of fields" and then for each field, "here's the length of the field" etc.
+    * I'm a little hung up on this. I have an idea for doing a "two-segment" approach where the first segment is basically
+      three offsets into the second segment. The first offset is the offset of the class name, the second offset
+      is the offset of the first field name, and the third offset is the offset of the first method name. The field
+      names and method names are delimited by the null terminator or some illegal character. That should work fine. But
+      what I really want is an unadulterated segment of my data. This should be the absolute best for cache hits, and
+      also it's just non-arbitrary. It is what it is. Can we express that? Let's boil it down to a single-file example
+      that defines a contiguous memory segment, writes a struct (type 'X') at the start, writes a string that, and then
+      writes another struct (type 'X') after that. This can't be expressed as a sequence because the string is
+      variable-width. Can we still get the advantage of the MemoryLayout for struct 'X' and var handles? I think we need
+      to do manual offset arithmetic. Hopefully that's the only trade-off. UPDATE: I have some working code in `OffsetArithmeticForMemoryLayoutsDemo.java`
+      but it does low-level work in a way that we are not interested in maintaining. The effect of the code in terms of
+      physical memory usage is what we want, but the source code is not. Can we apply the MemoryLayout abstraction to
+      this code?
   * Glob match on foreign memory.
 * [x] DONE Move this to its own repository. `jdk-playground` isn't the right place because FFM is a library and runtime feature.
