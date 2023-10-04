@@ -29,6 +29,8 @@ Follow these instructions to build and run the program.
    * ```shell
      build/install/java-foreign-function-and-memory-api-playground/bin/java-foreign-function-and-memory-api-playground
      ```
+   * While it's possible to use Gradle as program runner, I would prefer to escape from Gradle after the build process
+     and run the program using the start script. This is one more step, but on the other hand, it's more explicit.
 
 
 ## Wish List
@@ -38,7 +40,10 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [x] DONE Scaffold.
 * [x] DONE Write to foreign memory.
 * [x] DONE Read from foreign memory.
-* [ ] IN PROGRESS Do something more interesting. Can we implement a "glob matcher" program that scans a segment of foreign
+* [ ] IN PROGRESS (UPDATE: maybe forget glob matching. I like showcasing the variable width stuff, but I don't want to
+  lose the fixed width component so I really want to keep the struct of "number of methods" and "number of fields". Support
+  a regex search maybe on class name AND support a "find classes with greater than N methods" or "find classes with greater than N fields")
+  Do something more interesting. Can we implement a "glob matcher" program that scans a segment of foreign
   memory? We could read, let's say all classes on the classpath, extract their method and field names and store this as a
   corpus of data. Then, we can match on this data using globs like "stat*" which would match "static", "statistics", etc. 
   This is a "search" use case, so it makes the program more convincing. I think this should work, because to
@@ -90,5 +95,6 @@ General clean-ups, TODOs and things I wish to implement for this project:
       but it does low-level work in a way that we are not interested in maintaining. The effect of the code in terms of
       physical memory usage is what we want, but the source code is not. Can we apply the MemoryLayout abstraction to
       this code? UPDATE: No we need to do manual offset arithmetic. Not the end of the world.
+  * DONE Write the full class names to the memory segment since we solved the variable-width problem. 
   * Glob match on foreign memory.
 * [x] DONE Move this to its own repository. `jdk-playground` isn't the right place because FFM is a library and runtime feature.

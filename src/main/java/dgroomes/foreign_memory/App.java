@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.foreign.*;
 import java.lang.foreign.MemoryLayout.PathElement;
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -33,70 +33,85 @@ public class App {
 
             // Define the domain data structures in terms of MemoryLayout objects. MemoryLayout is a core component of
             // the Foreign Memory API.
-            //
-            // Specifically, we define a sequence of "class info" structs. Notice how we have the option of using
-            // structs in Java (well by way of some indirection). This option is a great luxury! By necessity, the
-            // index is fixed width. Later we will create a big memory segment to store the class fields and methods
-            // because those are variable width. We have to figure that out later.
-            SequenceLayout classInfoSequenceLayout;
-            {
-                StructLayout classInfoStructLayout = MemoryLayout.structLayout(
-                        MemoryLayout.sequenceLayout(32, ValueLayout.JAVA_BYTE).withName("name"), // maybe this should be an address? Strugging. Can't get a varhandle to a sequence.
-                        ValueLayout.JAVA_SHORT.withName("numberOfFields"),
-                        ValueLayout.JAVA_SHORT.withName("numberOfMethods")).withName("classInfoStructLayout");
+            StructLayout structLayout = MemoryLayout.structLayout(
+                    ValueLayout.JAVA_SHORT.withName("classNameLength"),
+                    ValueLayout.JAVA_SHORT.withName("numberOfFields"),
+                    ValueLayout.JAVA_SHORT.withName("numberOfMethods")).withName("classInfoStructLayout");
 
-                classInfoSequenceLayout = MemoryLayout.sequenceLayout(elementCount, classInfoStructLayout).withName("classInfoSequenceLayout");
-            }
+            // Compute how many bytes we need to allocate to put all the class names, byte lengths, and counts in the
+            // memory segment.
+            long totalBytesNeeded = classInfoList.stream().mapToLong(it -> {
+                var classNameBytes = it.className().getBytes(StandardCharsets.UTF_8).length;
 
-            // Get "accessor" objects for the data. These are VarHandles and MethodHandles.
-            MethodHandle nameHandle;
-            VarHandle numberOfFieldsHandle;
-            VarHandle numberOfMethodsHandle;
-            {
-                nameHandle = classInfoSequenceLayout.sliceHandle(
-                        PathElement.sequenceElement(),
-                        PathElement.groupElement("name"));
+                // For extra realism, let's do this data check that we would have to do in the real world.
+                if (classNameBytes > Short.MAX_VALUE)
+                    throw new RuntimeException("The string is too long to express its length as a short.");
 
-                numberOfFieldsHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.groupElement("numberOfFields"));
-                numberOfMethodsHandle = classInfoSequenceLayout.varHandle(PathElement.sequenceElement(), PathElement.groupElement("numberOfMethods"));
-            }
+                return structLayout.byteSize() + classNameBytes + 1; // The "+ 1" is for the null terminator
+            }).sum();
 
-            // Write the data.
+            // Get "accessor" objects for the data.
+            VarHandle classNameLengthHandle = structLayout.varHandle(PathElement.groupElement("classNameLength"));
+            VarHandle numberOfFieldsHandle = structLayout.varHandle(PathElement.groupElement("numberOfFields"));
+            VarHandle numberOfMethodsHandle = structLayout.varHandle(PathElement.groupElement("numberOfMethods"));
+
+            // Allocate and write the memory segments.
             log.info("Let's write the data to a memory segment...");
-            MemorySegment segment;
+            MemorySegment overallSegment;
+            MemorySegment structBuffer;
             {
-                segment = arena.allocate(classInfoSequenceLayout);
-                for (int i = 0; i < classInfoList.size(); i++) {
-                    var classInfo = classInfoList.get(i);
+                overallSegment = arena.allocate(totalBytesNeeded);
+                log.info("Allocated %,d bytes of memory.".formatted(totalBytesNeeded));
+                structBuffer = arena.allocate(structLayout);
 
-                    String classNameTruncated;
+                long offset = 0;
+                for (ClassScanner.ClassInfo classInfo : classInfoList) {
+                    int classNameBytesLength = classInfo.className().getBytes(StandardCharsets.UTF_8).length;
+
+                    // Write to the struct buffer
                     {
-                        var className = classInfo.className();
-                        // Note: the class name is truncated to 31 bytes because the 32th bit is reserved for the null
-                        // terminator.
-                        classNameTruncated = StringUtil.getLimitedByteString(className, 31);
+                        classNameLengthHandle.set(structBuffer, (short) classNameBytesLength);
+                        numberOfFieldsHandle.set(structBuffer, (short) classInfo.fieldNames().size());
+                        numberOfMethodsHandle.set(structBuffer, (short) classInfo.methodNames().size());
                     }
 
-                    var classNameSegment = (MemorySegment) nameHandle.invoke(segment, i);
-                    classNameSegment.setUtf8String(0, classNameTruncated);
+                    // Copy the struct buffer (fixed width data) to the larger memory segment
+                    {
+                        MemorySegment.copy(structBuffer, 0, overallSegment, offset, structLayout.byteSize());
+                        offset += structLayout.byteSize();
+                    }
 
-                    numberOfFieldsHandle.set(segment, (long) i, (short) classInfo.fieldNames().size());
-                    numberOfMethodsHandle.set(segment, (long) i, (short) classInfo.methodNames().size());
+                    // Write the class name (variable width data) to the larger memory segment
+                    {
+                        overallSegment.setUtf8String(offset, classInfo.className());
+                        offset += classNameBytesLength + 1; // +1 for the null terminator
+                    }
                 }
             }
-            log.info("Done. Wrote {} elements to the memory segment", elementCount);
+            log.info("Done. Wrote %,d elements to the memory segment".formatted(elementCount));
             log.info("");
 
             log.info("Let's read a sample of the data back out of the memory segment...");
-            for (int baseIndex = 0, multipliedIndex = baseIndex;
-                 baseIndex < SAMPLE_READ_COUNT && multipliedIndex < elementCount;
-                 baseIndex++, multipliedIndex = baseIndex * 200) {
+            {
+                long offset = 0;
+                for (int elementsRead = 0; elementsRead < SAMPLE_READ_COUNT && offset < totalBytesNeeded; elementsRead++) {
 
-                var classNameSegment = (MemorySegment) nameHandle.invoke(segment, multipliedIndex);
-                var name = classNameSegment.getUtf8String(0);
-                var numberOfFields = (short) numberOfFieldsHandle.get(segment, multipliedIndex);
-                var numberOfMethods = (short) numberOfMethodsHandle.get(segment, multipliedIndex);
-                log.info("  name: {}, numberOfFields: {}, numberOfMethods: {}", name, numberOfFields, numberOfMethods);
+                    // Read the data into the struct buffer (isn't this needlessly expensive? maybe not because it's so
+                    // small, but I don't know.)
+                    MemorySegment.copy(overallSegment, offset, structBuffer, 0, structLayout.byteSize());
+
+                    // Read the struct (fixed width) data
+                    var classNameLength = (short) classNameLengthHandle.get(structBuffer);
+                    var numberOfFields = (short) numberOfFieldsHandle.get(structBuffer);
+                    var numberOfMethods = (short) numberOfMethodsHandle.get(structBuffer);
+                    offset += structLayout.byteSize();
+
+                    // Read the class name (variable width) data
+                    String className = overallSegment.getUtf8String(offset);
+                    offset += classNameLength + 1; // +1 for the null terminator
+
+                    log.info("  className: {}, numberOfFields: {}, numberOfMethods: {}", className, numberOfFields, numberOfMethods);
+                }
             }
         }
     }
