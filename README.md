@@ -40,7 +40,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [x] DONE Scaffold.
 * [x] DONE Write to foreign memory.
 * [x] DONE Read from foreign memory.
-* [ ] IN PROGRESS (UPDATE: maybe forget glob matching. I like showcasing the variable width stuff, but I don't want to
+* [x] SKIP (Partially implemented: I'm not doing glob matching but going to keep all the work) (UPDATE: maybe forget glob matching. I like showcasing the variable width stuff, but I don't want to
   lose the fixed width component so I really want to keep the struct of "number of methods" and "number of fields". Support
   a regex search maybe on class name AND support a "find classes with greater than N methods" or "find classes with greater than N fields")
   Do something more interesting. Can we implement a "glob matcher" program that scans a segment of foreign
@@ -98,3 +98,9 @@ General clean-ups, TODOs and things I wish to implement for this project:
   * DONE Write the full class names to the memory segment since we solved the variable-width problem. 
   * Glob match on foreign memory.
 * [x] DONE Move this to its own repository. `jdk-playground` isn't the right place because FFM is a library and runtime feature.
+* [ ] Implement search on "find classes with greater than N methods"
+  * Implement for on the list of records
+  * Implement for on the memory segment
+* [ ] Basic performance comparison. Run the record-based search N times, and run the memory-segment-based search N times
+  and compare the times. Not sure what to expect. I would expect the memory segment search to be faster but as always,
+  real world performance is hard to predict.
