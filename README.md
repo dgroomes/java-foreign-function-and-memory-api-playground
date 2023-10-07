@@ -46,7 +46,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [x] DONE Delete the original/main example. It's not effective at showing new concepts and the performance doesn't actually work.
   I'm going to explore applications of FFM API in a different project: <https://github.com/dgroomes/java-columnar-query-engine>.
 * [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
-* [ ] Upgrade Gradle
+* [x] DONE Upgrade Gradle
 
 
 ## Finished Wish List Items
