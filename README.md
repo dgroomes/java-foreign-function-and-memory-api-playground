@@ -8,8 +8,22 @@
 Java's [Foreign Function & Memory API](https://openjdk.org/jeps/442) is a new and powerful feature of the platform. It's
 a preview feature in Java 21 and is expected to be finalized soon thereafter. I want to learn how to use it.
 
-In this project, we'll build a simple program that writes data (what kind of data should we pick?) into foreign segments
-of memory and then searches it and summarizes it. (Maybe just a byte count?)
+
+## Standalone subprojects
+
+This repository illustrates different concepts, patterns and examples via standalone subprojects. Each subproject is
+completely independent of the others and do not depend on the root project. This _standalone subproject constraint_
+forces the subprojects to be complete and maximizes the reader's chances of successfully running, understanding, and
+re-using the code.
+
+The subprojects include:
+
+
+### `heterogeneous-foreign-memory/`
+
+Interact with heterogeneous data (variable width) stored in `MemorySegment`s using the Foreign Function & Memory API.
+
+See the README in [heterogeneous-foreign-memory/](heterogeneous-foreign-memory/).
 
 
 ## Instructions
@@ -37,11 +51,11 @@ Follow these instructions to build and run the program.
 
 General clean-ups, TODOs and things I wish to implement for this project:
 
-* [ ] Scaffold the subprojects shape (README, settings.gradle.kts, etc)
+* [x] DONE Scaffold the subprojects shape (README, settings.gradle.kts, etc)
 * [ ] Migrate <https://github.com/dgroomes/jdk-playground/tree/main/jextract> to a subproject here
 * [ ] (I don't super want to do this because I've already explored this and get it, and don't have a ready-made program)
   Create a bare-bones memory layout example. Just x,y points or something, like they talk about often in the OpenJDK. 
-* [ ] Extract jaggedsteppingwindow project (and I guess it's ok to bundle in StringOnlyDemo because it was a stepping
+* [x] DONE Extract jaggedsteppingwindow project (and I guess it's ok to bundle in StringOnlyDemo because it was a stepping
   stone and tightly related)
 * [ ] Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
 * [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
