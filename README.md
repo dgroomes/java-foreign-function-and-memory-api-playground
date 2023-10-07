@@ -23,6 +23,7 @@ The subprojects include:
 
 Interact with heterogeneous data (variable width) stored in `MemorySegment`s using the Foreign Function & Memory API.
 
+
 See the README in [heterogeneous-foreign-memory/](heterogeneous-foreign-memory/).
 
 ### `jextract/`
@@ -36,17 +37,10 @@ See the README in [jextract/](jextract/).
 
 General clean-ups, TODOs and things I wish to implement for this project:
 
-* [x] DONE Scaffold the subprojects shape (README, settings.gradle.kts, etc)
-* [x] DONE Migrate <https://github.com/dgroomes/jdk-playground/tree/main/jextract> to a subproject here
 * [ ] (I don't super want to do this because I've already explored this and get it, and don't have a ready-made program)
   Create a bare-bones memory layout example. Just x,y points or something, like they talk about often in the OpenJDK. 
-* [x] DONE Extract jaggedsteppingwindow project (and I guess it's ok to bundle in StringOnlyDemo because it was a stepping
-  stone and tightly related)
 * [ ] Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
-* [x] DONE Delete the original/main example. It's not effective at showing new concepts and the performance doesn't actually work.
-  I'm going to explore applications of FFM API in a different project: <https://github.com/dgroomes/java-columnar-query-engine>.
 * [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
-* [x] DONE Upgrade Gradle
 
 
 ## Finished Wish List Items
@@ -112,3 +106,10 @@ General clean-ups, TODOs and things I wish to implement for this project:
   * DONE Write the full class names to the memory segment since we solved the variable-width problem.
   * Glob match on foreign memory.
 * [x] DONE Move this to its own repository. `jdk-playground` isn't the right place because FFM is a library and runtime feature.
+* [x] DONE Scaffold the subprojects shape (README, settings.gradle.kts, etc)
+* [x] DONE Migrate <https://github.com/dgroomes/jdk-playground/tree/main/jextract> to a subproject here
+* [x] DONE Extract jaggedsteppingwindow project (and I guess it's ok to bundle in StringOnlyDemo because it was a stepping
+  stone and tightly related)
+* [x] DONE Delete the original/main example. It's not effective at showing new concepts and the performance doesn't actually work.
+  I'm going to explore applications of FFM API in a different project: <https://github.com/dgroomes/java-columnar-query-engine>.
+* [x] DONE Upgrade Gradle
