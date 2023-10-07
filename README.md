@@ -37,6 +37,15 @@ Follow these instructions to build and run the program.
 
 General clean-ups, TODOs and things I wish to implement for this project:
 
+* [ ] Narrow the scope and modularize the scope. Go to a subprojects approach. I'll have a bare-bones `jextract` subproject
+  (migrated from <https://github.com/dgroomes/jdk-playground/tree/main/jextract>) which only passes one integer, a
+  foreign memory subproject to show memory layouts perhaps (and maybe a second one for the jaggedsteppingwindow), and
+  maybe an intermediate project that passes a complex type, like an array of strings or something. A stretch goal would
+  be to do upcalls from C to Java, but I don't have a personal interest in that right now.
+
+
+## Finished Wish List Items
+
 * [x] DONE Scaffold.
 * [x] DONE Write to foreign memory.
 * [x] DONE Read from foreign memory.
@@ -45,7 +54,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
   a regex search maybe on class name AND support a "find classes with greater than N methods" or "find classes with greater than N fields")
   Do something more interesting. Can we implement a "glob matcher" program that scans a segment of foreign
   memory? We could read, let's say all classes on the classpath, extract their method and field names and store this as a
-  corpus of data. Then, we can match on this data using globs like "stat*" which would match "static", "statistics", etc. 
+  corpus of data. Then, we can match on this data using globs like "stat*" which would match "static", "statistics", etc.
   This is a "search" use case, so it makes the program more convincing. I think this should work, because to
   match on simple globs, we don't need to new up a `String` object, we should be able to just compare the bytes directly.
   Newing up a `String` object would cause tons of allocations which would mostly defeat the purpose of using foreign
@@ -95,11 +104,6 @@ General clean-ups, TODOs and things I wish to implement for this project:
       but it does low-level work in a way that we are not interested in maintaining. The effect of the code in terms of
       physical memory usage is what we want, but the source code is not. Can we apply the MemoryLayout abstraction to
       this code? UPDATE: No we need to do manual offset arithmetic. Not the end of the world.
-  * DONE Write the full class names to the memory segment since we solved the variable-width problem. 
+  * DONE Write the full class names to the memory segment since we solved the variable-width problem.
   * Glob match on foreign memory.
 * [x] DONE Move this to its own repository. `jdk-playground` isn't the right place because FFM is a library and runtime feature.
-* [ ] Narrow the scope and modularize the scope. Go to a subprojects approach. I'll have a bare-bones `jextract` subproject
-  (migrated from <https://github.com/dgroomes/jdk-playground/tree/main/jextract>) which only passes one integer, a
-  foreign memory subproject to show memory layouts perhaps (and maybe a second one for the jaggedsteppingwindow), and
-  maybe an intermediate project that passes a complex type, like an array of strings or something. A stretch goal would
-  be to do upcalls from C to Java, but I don't have a personal interest in that right now.
