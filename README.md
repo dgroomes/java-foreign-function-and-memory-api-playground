@@ -32,6 +32,12 @@ Call from Java code into C code using the `jextract` tool.
 
 See the README in [jextract/](jextract/).
 
+### `memory-addresses/`
+
+NOT YET IMPLEMENTED
+
+An intermediate FFM example that uses the `MemoryAddress` class to describe the result of a sort operation from C code.  
+
 
 ## Wish List
 
@@ -39,7 +45,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 
 * [ ] (I don't super want to do this because I've already explored this and get it, and don't have a ready-made program)
   Create a bare-bones memory layout example. Just x,y points or something, like they talk about often in the OpenJDK. 
-* [ ] Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
+* [ ] IN PROGRESS Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
 * [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
 
 
