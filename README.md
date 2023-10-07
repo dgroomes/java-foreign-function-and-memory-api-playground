@@ -98,9 +98,8 @@ General clean-ups, TODOs and things I wish to implement for this project:
   * DONE Write the full class names to the memory segment since we solved the variable-width problem. 
   * Glob match on foreign memory.
 * [x] DONE Move this to its own repository. `jdk-playground` isn't the right place because FFM is a library and runtime feature.
-* [ ] Implement search on "find classes with greater than N methods"
-  * Implement for on the list of records
-  * Implement for on the memory segment
-* [ ] Basic performance comparison. Run the record-based search N times, and run the memory-segment-based search N times
-  and compare the times. Not sure what to expect. I would expect the memory segment search to be faster but as always,
-  real world performance is hard to predict.
+* [ ] Narrow the scope and modularize the scope. Go to a subprojects approach. I'll have a bare-bones `jextract` subproject
+  (migrated from <https://github.com/dgroomes/jdk-playground/tree/main/jextract>) which only passes one integer, a
+  foreign memory subproject to show memory layouts perhaps (and maybe a second one for the jaggedsteppingwindow), and
+  maybe an intermediate project that passes a complex type, like an array of strings or something. A stretch goal would
+  be to do upcalls from C to Java, but I don't have a personal interest in that right now.
