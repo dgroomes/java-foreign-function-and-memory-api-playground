@@ -37,11 +37,14 @@ Follow these instructions to build and run the program.
 
 General clean-ups, TODOs and things I wish to implement for this project:
 
-* [ ] Narrow the scope and modularize the scope. Go to a subprojects approach. I'll have a bare-bones `jextract` subproject
-  (migrated from <https://github.com/dgroomes/jdk-playground/tree/main/jextract>) which only passes one integer, a
-  foreign memory subproject to show memory layouts perhaps (and maybe a second one for the jaggedsteppingwindow), and
-  maybe an intermediate project that passes a complex type, like an array of strings or something. A stretch goal would
-  be to do upcalls from C to Java, but I don't have a personal interest in that right now.
+* [ ] Scaffold the subprojects shape (README, settings.gradle.kts, etc)
+* [ ] Migrate <https://github.com/dgroomes/jdk-playground/tree/main/jextract> to a subproject here
+* [ ] (I don't super want to do this because I've already explored this and get it, and don't have a ready-made program)
+  Create a bare-bones memory layout example. Just x,y points or something, like they talk about often in the OpenJDK. 
+* [ ] Extract jaggedsteppingwindow project (and I guess it's ok to bundle in StringOnlyDemo because it was a stepping
+  stone and tightly related)
+* [ ] Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
+* [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
 
 
 ## Finished Wish List Items
