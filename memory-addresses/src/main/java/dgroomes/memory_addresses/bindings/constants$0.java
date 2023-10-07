@@ -11,7 +11,7 @@ final class constants$0 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$0() {}
-    static final FunctionDescriptor const$0 = FunctionDescriptor.of(JAVA_INT);
+    static final FunctionDescriptor const$0 = FunctionDescriptor.of(RuntimeHelper.POINTER);
     static final MethodHandle const$1 = RuntimeHelper.downcallHandleVariadic(
         "hello",
         constants$0.const$0

@@ -22,13 +22,13 @@ public class hello_h  {
     }
     /**
      * {@snippet :
-     * int hello(,...);
+     * char* hello(,...);
      * }
      */
-    public static int hello(Object... x0) {
+    public static MemorySegment hello(Object... x0) {
         var mh$ = hello$MH();
         try {
-            return (int)mh$.invokeExact(x0);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(x0);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

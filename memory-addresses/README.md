@@ -58,6 +58,6 @@ Follow these instructions to build and run the program.
 General clean-ups, TODOs and things I wish to implement for this project:
 
 * [x] DONE Scaffold
-* [ ] Implement a C function that returns a string. How to get the string into the Java program? This is where
+* [x] DONE (but how do we deallocate the memory allocated by C? We're not in an 'Arena'. Doesn't this leak?) Implement a C function that returns a string. How to get the string into the Java program? This is where
   MemoryAddress comes in.
 * [ ] Implement a C function that sorts an array of strings, in a way that works with the FFM API.
