@@ -32,27 +32,6 @@ Call from Java code into C code using the `jextract` tool.
 See the README in [jextract/](jextract/).
 
 
-## Instructions
-
-Follow these instructions to build and run the program.
-
-1. Use Java 17 but have Java 21 installed
-   * Java 21 is in preview. It's too new for Gradle to support it. So, use Java 17 to run Gradle tasks but have Java 21
-     installed so that Gradle can delegate to Java 21's `javac` and `java` commands for compiling and running our
-     program.
-2. Build the program distribution:
-   * ```shell
-     ./gradlew installDist
-     ```
-3. Switch to Java 21
-4. Run the program:
-   * ```shell
-     build/install/java-foreign-function-and-memory-api-playground/bin/java-foreign-function-and-memory-api-playground
-     ```
-   * While it's possible to use Gradle as program runner, I would prefer to escape from Gradle after the build process
-     and run the program using the start script. This is one more step, but on the other hand, it's more explicit.
-
-
 ## Wish List
 
 General clean-ups, TODOs and things I wish to implement for this project:
@@ -64,7 +43,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [x] DONE Extract jaggedsteppingwindow project (and I guess it's ok to bundle in StringOnlyDemo because it was a stepping
   stone and tightly related)
 * [ ] Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
-* [ ] Delete the main example. It's not effective at showing new concepts and the performance doesn't actually work.
+* [x] DONE Delete the original/main example. It's not effective at showing new concepts and the performance doesn't actually work.
   I'm going to explore applications of FFM API in a different project: <https://github.com/dgroomes/java-columnar-query-engine>.
 * [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
 * [ ] Upgrade Gradle
