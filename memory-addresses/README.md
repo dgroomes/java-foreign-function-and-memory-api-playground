@@ -60,4 +60,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [x] DONE Scaffold
 * [x] DONE (but how do we deallocate the memory allocated by C? We're not in an 'Arena'. Doesn't this leak?) Implement a C function that returns a string. How to get the string into the Java program? This is where
   MemoryAddress comes in.
+* [ ] Figure out how to cleanup the memory allocated by C. There should be some good examples in <https://github.com/openjdk/jextract/blob/master/samples>.
 * [ ] Implement a C function that sorts an array of strings, in a way that works with the FFM API.
+* [ ] I think I want to turn this into a bitmap example. I like the idea of operating on a bitmap in C. So this should
+  be renamed from 'memory-addresses' (that was a working title in the first place). 
