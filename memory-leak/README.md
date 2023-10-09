@@ -1,8 +1,8 @@
-# memory-addresses
+# memory-leak
 
 NOT YET FULLY IMPLEMENTED
 
-An intermediate FFM example that uses the `MemoryAddress` class to describe the result of a sort operation from C code.
+An example "memory leak" programming mistake when calling a C function from a Java program via the Foreign Function and Memory API.
 
 
 ## Overview
@@ -42,11 +42,11 @@ Follow these instructions to build and run the program.
 6. Run the Java program
     * Make sure you are using Java 21.
     * ```shell
-      build/install/memory-addresses/bin/memory-addresses
+      build/install/memory-leak/bin/memory-leak
       ```
     * It should look something like this:
       ```text
-      $ build/install/memory-addresses/bin/memory-addresses
+      $ build/install/memory-leak/bin/memory-leak
       (Not yet fully implemented)
       Let's call native code from Java! Here we go...
       The C function returned 123.
@@ -68,9 +68,16 @@ General clean-ups, TODOs and things I wish to implement for this project:
      alternative memory allocators beside `malloc`, like `jemalloc`, but that's just not a thing. So, what you have to do
      is call back into the C library which needs to expose a function that frees the memory. So, integrating to foreign
      functions absolute exposes you to classic C memory management problems. But, that's just trade off.
-* [ ] Turn this into a 'memory-leak' subproject which shows an example memory leak. The idea is that when calling a C
+* [ ] IN PROGRESS Turn this into a 'memory-leak' subproject which shows an example memory leak. The idea is that when calling a C
   library, you still need to explicitly manage the memory allocated by the C functions. FFM API does not save you from
   this burden. Specifically, I'll implement a commandline program that reads a line-count for a file using C code. But
   the function keeps the read content in-memory and it's up to the caller to free it. You should be able to see, in
   Activity Manager, that the process is using more and more memory. As an aside, does the JVM have any idea how much
   off-heap memory is used? I would guess not, but maybe it calls into OS functions to get total memory used?
+  * DONE Rename
+  * Implement a C function to read a file and return a struct containing the contents (pointer of course) and line count
+  * Call the C function from Java
+  * From Java, read an entire directory
+  * Allow user to enter a directory path as a commandline argument. This is the 'read' command.
+  * Offer a 'read-safe' command which actually frees the memory
+  * (stretch) Can a Java program see how much memory (including non-JVM) memory is used?

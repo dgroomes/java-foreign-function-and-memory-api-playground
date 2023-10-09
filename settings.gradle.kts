@@ -24,4 +24,4 @@ rootProject.name = "java-foreign-function-and-memory-api-playground"
 // You get code completion and project navigation out-of-the-box. Pretty slick!
 include("heterogeneous-foreign-memory")
 includeBuild("jextract")
-includeBuild("memory-addresses")
+includeBuild("memory-leak")

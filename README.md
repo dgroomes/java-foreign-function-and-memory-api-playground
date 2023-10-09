@@ -32,11 +32,13 @@ Call from Java code into C code using the `jextract` tool.
 
 See the README in [jextract/](jextract/).
 
-### `memory-addresses/`
+### `memory-leak/`
 
 NOT YET IMPLEMENTED
 
-An intermediate FFM example that uses the `MemoryAddress` class to describe the result of a sort operation from C code.  
+An example "memory leak" programming mistake when calling a C function from a Java program via the Foreign Function and Memory API.
+
+See the README in [memory-leak/](memory-leak/).
 
 
 ## Wish List

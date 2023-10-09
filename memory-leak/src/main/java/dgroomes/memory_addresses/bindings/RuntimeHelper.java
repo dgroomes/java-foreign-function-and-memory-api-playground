@@ -39,7 +39,7 @@ final class RuntimeHelper {
             (size, align) -> Arena.ofAuto().allocate(size, align);
 
     static {
-        System.load("/Users/dave/repos/personal/java-foreign-function-and-memory-api-playground/memory-addresses/hello.dylib");
+        System.load("/Users/dave/repos/personal/java-foreign-function-and-memory-api-playground/memory-leak/hello.dylib");
         SymbolLookup loaderLookup = SymbolLookup.loaderLookup();
         SYMBOL_LOOKUP = name -> loaderLookup.find(name).or(() -> LINKER.defaultLookup().find(name));
     }
