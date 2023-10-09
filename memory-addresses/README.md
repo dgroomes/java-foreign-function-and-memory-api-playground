@@ -60,7 +60,17 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [x] DONE Scaffold
 * [x] DONE (but how do we deallocate the memory allocated by C? We're not in an 'Arena'. Doesn't this leak?) Implement a C function that returns a string. How to get the string into the Java program? This is where
   MemoryAddress comes in.
-* [ ] Figure out how to cleanup the memory allocated by C. There should be some good examples in <https://github.com/openjdk/jextract/blob/master/samples>.
-* [ ] Implement a C function that sorts an array of strings, in a way that works with the FFM API.
-* [ ] I think I want to turn this into a bitmap example. I like the idea of operating on a bitmap in C. So this should
-  be renamed from 'memory-addresses' (that was a working title in the first place). 
+* [x] DONE Figure out how to clean up the memory allocated by C. There should be some good examples in <https://github.com/openjdk/jextract/blob/master/samples>.
+   * Answer: just like normal systems programming, you have to free the memory yourself. I was imagining (in my naive experience),
+     that "hey, the FFM API exposes an Arena, it gets clean up automatically by the try-with-resources block, and process
+     memory is freed by the OS after the process is done" but there is no such magic. In theory, C libraries could use
+     some fictional alternative memory allocator that has a "free all" function. And in fact, some C libraries do support
+     alternative memory allocators beside `malloc`, like `jemalloc`, but that's just not a thing. So, what you have to do
+     is call back into the C library which needs to expose a function that frees the memory. So, integrating to foreign
+     functions absolute exposes you to classic C memory management problems. But, that's just trade off.
+* [ ] Turn this into a 'memory-leak' subproject which shows an example memory leak. The idea is that when calling a C
+  library, you still need to explicitly manage the memory allocated by the C functions. FFM API does not save you from
+  this burden. Specifically, I'll implement a commandline program that reads a line-count for a file using C code. But
+  the function keeps the read content in-memory and it's up to the caller to free it. You should be able to see, in
+  Activity Manager, that the process is using more and more memory. As an aside, does the JVM have any idea how much
+  off-heap memory is used? I would guess not, but maybe it calls into OS functions to get total memory used?
