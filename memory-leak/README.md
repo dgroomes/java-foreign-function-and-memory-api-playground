@@ -24,16 +24,16 @@ Follow these instructions to build and run the program.
 2. Use a matching `jextract` distribution
 3. Compile the C library
     * ```shell
-      clang -dynamiclib -o hello.dylib hello.c
+      clang -dynamiclib -o readfile.dylib readfile.c
       ```
 4. Extract the Java bindings
     * ```shell
       jextract --source \
        --output src/main/java \
-       --target-package dgroomes.memory_addresses.bindings \
+       --target-package dgroomes.memory_leak.bindings \
        -I "$PWD" \
-       -l "$PWD/hello.dylib" \
-      hello.h
+       -l "$PWD/readfile.dylib" \
+      readfile.h
       ```
 5. Compile the Java program distribution
     * ```shell
@@ -75,7 +75,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
   Activity Manager, that the process is using more and more memory. As an aside, does the JVM have any idea how much
   off-heap memory is used? I would guess not, but maybe it calls into OS functions to get total memory used?
   * DONE Rename
-  * Implement a C function to read a file and return a struct containing the contents (pointer of course) and line count
+  * DONE Implement a C function to read a file and return a struct containing the contents (pointer of course) and line count
   * Call the C function from Java
   * From Java, read an entire directory
   * Allow user to enter a directory path as a commandline argument. This is the 'read' command.

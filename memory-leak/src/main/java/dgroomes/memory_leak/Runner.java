@@ -1,6 +1,6 @@
-package dgroomes.memory_addresses;
+package dgroomes.memory_leak;
 
-import dgroomes.memory_addresses.bindings.hello_h;
+import dgroomes.memory_leak.bindings.hello_h;
 
 import java.lang.foreign.MemorySegment;
 

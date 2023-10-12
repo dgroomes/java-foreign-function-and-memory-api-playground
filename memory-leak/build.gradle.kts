@@ -9,7 +9,7 @@ java {
 }
 
 application {
-    mainClass.set("dgroomes.memory_addresses.Runner")
+    mainClass.set("dgroomes.memory_leak.Runner")
 }
 
 /**
