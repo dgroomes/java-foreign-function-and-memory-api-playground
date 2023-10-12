@@ -76,7 +76,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
   off-heap memory is used? I would guess not, but maybe it calls into OS functions to get total memory used?
   * DONE Rename
   * DONE Implement a C function to read a file and return a struct containing the contents (pointer of course) and line count
-  * Call the C function from Java
+  * DONE Call the C function from Java
   * From Java, read an entire directory
   * Allow user to enter a directory path as a commandline argument. This is the 'read' command.
   * Offer a 'read-safe' command which actually frees the memory
