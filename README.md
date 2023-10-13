@@ -23,8 +23,8 @@ The subprojects include:
 
 Interact with heterogeneous data (variable width) stored in `MemorySegment`s using the Foreign Function & Memory API.
 
-
 See the README in [heterogeneous-foreign-memory/](heterogeneous-foreign-memory/).
+
 
 ### `jextract/`
 
@@ -32,9 +32,8 @@ Call from Java code into C code using the `jextract` tool.
 
 See the README in [jextract/](jextract/).
 
-### `memory-leak/`
 
-NOT YET IMPLEMENTED
+### `memory-leak/`
 
 An example "memory leak" programming mistake when calling a C function from a Java program via the Foreign Function and Memory API.
 
@@ -47,7 +46,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 
 * [ ] (I don't super want to do this because I've already explored this and get it, and don't have a ready-made program)
   Create a bare-bones memory layout example. Just x,y points or something, like they talk about often in the OpenJDK. 
-* [ ] IN PROGRESS Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
+* [x] DONE (see `memory-leak/` subproject) Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
 * [ ] Upcalls from C to Java. This is interesting for error handling. A C function in a library can have a callback
   argument/function that should be called when there is an error. I like the idea of this pattern. 
 
