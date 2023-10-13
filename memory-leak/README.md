@@ -5,7 +5,7 @@ An example "memory leak" programming mistake when calling a C function from a Ja
 
 ## Overview
 
-The FFM API is great because it makes "calling C code from Java easier". But, it can't make C itself any easies. As a
+The FFM API is great because it makes "calling C code from Java easier". But, it can't make C itself any easier. As a
 developer, you still bear the responsibility of managing memory allocated by C code even when you are operating from the
 comfort of a memory-managed runtime like the JVM. This project demonstrates a style of memory leak that you might make
 when calling C code from Java.
@@ -45,10 +45,10 @@ Follow these instructions to build and run the program.
     * It should look something like this:
       ```text
       $ build/install/memory-leak/bin/memory-leak
-      This program will compute the size/lines of all regular files in a given directory. But it does it in a cool way because it calls C library using the Foreign Function and Memory API!
+      This program will compute the size/lines of all regular files in a given directory. But it does it in a cool way because it calls a C library using the Foreign Function and Memory API!
       Enter a directory (or 'exit'):
       ```
-    * Enter a directory to scan. Try `build`, `.` (current dir), `..` (parent dir), etc.
+    * Enter a directory to scan. Try `src`, `.` (current dir), `..` (parent dir), etc.
     * Check how much memory is used by the process using the following command.
     * ```shell
       ps aux | grep 'java' | grep 'memory_leak' | awk '{print $6/1024 " MiB"}'
@@ -56,7 +56,7 @@ Follow these instructions to build and run the program.
     * For me, it was 65MiB after I scanned a few directories. We can't tell if this is just normal JVM memory usage
       or if we have a memory leak.
     * Scan some more and check the memory usage again.
-    * For me, it was 117MiB. There's a memory leak! Check the code and plug the leak.
+    * For me, it was 117MiB. That's too high, there must be a memory leak! Check the code and plug the leak.
 
 
 ## Wish List

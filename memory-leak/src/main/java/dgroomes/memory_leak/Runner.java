@@ -37,7 +37,7 @@ public class Runner {
     }
 
     public static void main(String[] args) throws IOException {
-        out.printf("This program will compute the size/lines of all regular files in a given directory. But it does it in a cool way because it calls C library using the Foreign Function and Memory API!%n");
+        out.printf("This program will compute the size/lines of all regular files in a given directory. But it does it in a cool way because it calls a C library using the Foreign Function and Memory API!%n");
 
         /*
         Note: the Arena class is super helpful in freeing foreign memory that's allocated by the Java program, but it is
