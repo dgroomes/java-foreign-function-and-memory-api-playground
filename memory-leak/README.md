@@ -77,7 +77,9 @@ General clean-ups, TODOs and things I wish to implement for this project:
   * DONE Rename
   * DONE Implement a C function to read a file and return a struct containing the contents (pointer of course) and line count
   * DONE Call the C function from Java
-  * From Java, read an entire directory
+  * DONE From Java, read an entire directory
+  * DONE Create a `free` helper function for the file_data struct
   * Allow user to enter a directory path as a commandline argument. This is the 'read' command.
   * Offer a 'read-safe' command which actually frees the memory
   * (stretch) Can a Java program see how much memory (including non-JVM) memory is used?
+* [ ] Defect. My program is not counting the same bytes as `dust`. Not sure why yet.

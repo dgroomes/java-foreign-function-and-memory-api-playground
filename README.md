@@ -48,7 +48,8 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [ ] (I don't super want to do this because I've already explored this and get it, and don't have a ready-made program)
   Create a bare-bones memory layout example. Just x,y points or something, like they talk about often in the OpenJDK. 
 * [ ] IN PROGRESS Create an intermediate project that passes a complex type from C to Java, like an array of strings or something.
-* [ ] (stretch) upcalls from C to Java, but I don't have a personal interest in that right now.
+* [ ] Upcalls from C to Java. This is interesting for error handling. A C function in a library can have a callback
+  argument/function that should be called when there is an error. I like the idea of this pattern. 
 
 
 ## Finished Wish List Items

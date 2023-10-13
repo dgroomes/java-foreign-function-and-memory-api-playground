@@ -33,6 +33,22 @@ public class readfile_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle free_file_data$MH() {
+        return RuntimeHelper.requireNonNull(constants$1.const$1,"free_file_data");
+    }
+    /**
+     * {@snippet :
+     * void free_file_data(struct file_data* f);
+     * }
+     */
+    public static void free_file_data(MemorySegment f) {
+        var mh$ = free_file_data$MH();
+        try {
+            mh$.invokeExact(f);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
 }
 
 

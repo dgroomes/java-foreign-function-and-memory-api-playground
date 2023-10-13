@@ -17,7 +17,7 @@ struct file_data* read_file(char* name, long max_size) {
     // Open file
     FILE* file = fopen(name, "r");
     if (file == NULL) {
-        free(f);
+        free_file_data(f);
         return NULL;  // File open failed
     }
 
@@ -35,7 +35,7 @@ struct file_data* read_file(char* name, long max_size) {
     f->content = (char*) malloc(size + 1);
     if (f->content == NULL) {
         fclose(file);
-        free(f);
+        free_file_data(f);
         return NULL;  // Memory allocation failed
     }
 
@@ -58,6 +58,17 @@ struct file_data* read_file(char* name, long max_size) {
 
     fclose(file);
     return f;
+}
+
+void free_file_data(struct file_data *f) {
+    if (f == NULL) return;
+    if (f->name != NULL) {
+        free(f->name);
+    }
+    if (f->content != NULL) {
+        free(f->content);
+    }
+    free(f);
 }
 
 int main(int argc, char *argv[]) {

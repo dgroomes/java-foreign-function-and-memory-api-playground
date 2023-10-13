@@ -21,4 +21,11 @@ struct file_data {
  */
 struct file_data* read_file(char* name, long max_size);
 
+/**
+ * Free the memory allocated by read_file.
+ *
+ * @param f Pointer to a file_data struct
+ */
+void free_file_data(struct file_data *f);
+
 #endif
