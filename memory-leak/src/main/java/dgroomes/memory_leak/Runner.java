@@ -39,6 +39,10 @@ public class Runner {
     public static void main(String[] args) throws IOException {
         out.printf("This program will compute the size/lines of all regular files in a given directory. But it does it in a cool way because it calls C library using the Foreign Function and Memory API!%n");
 
+        /*
+        Note: the Arena class is super helpful in freeing foreign memory that's allocated by the Java program, but it is
+        completely unaware of the memory allocated by the foreign C function.
+        */
         try (Arena arena = Arena.ofConfined()) {
             try (var reader = new BufferedReader(new InputStreamReader(System.in))) {
                 var runner = new Runner(arena, reader);
@@ -49,7 +53,7 @@ public class Runner {
 
     public void run() throws IOException {
         while (true) {
-            out.print("Enter a directory ('exit' to quit): ");
+            out.print("Enter a directory (or 'exit'): ");
 
             // Read and validate the directory
             String command = reader.readLine().trim();
@@ -94,6 +98,10 @@ public class Runner {
             });
 
             out.printf("Found %,d lines and %,d bytes in the files in the directory '%s'%n", fileSummary.lines, fileSummary.bytes, dir);
+
+            // Normally, you would just let the JVM do garbage collection on its own, but we need to factor out the
+            // variability of JVM memory usage so that it's more clear that the C function is leaking memory.
+            System.gc();
         }
     }
 }

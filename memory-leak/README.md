@@ -1,18 +1,16 @@
 # memory-leak
 
-NOT YET FULLY IMPLEMENTED
-
 An example "memory leak" programming mistake when calling a C function from a Java program via the Foreign Function and Memory API.
 
 
 ## Overview
 
-The FFM API becomes especially interesting when you can use it do "substantial work" in C code that you could not do
-in Java code at the same level of performance. This project aims to show a working example of that kind of use case.
-I'm doubtful that it will actually demonstrate "better performance", but the architecture, concepts and code paths in
-this project are what is interesting. Performance benchmarking is its own science.
+The FFM API is great because it makes "calling C code from Java easier". But, it can't make C itself any easies. As a
+developer, you still bear the responsibility of managing memory allocated by C code even when you are operating from the
+comfort of a memory-managed runtime like the JVM. This project demonstrates a style of memory leak that you might make
+when calling C code from Java.
 
-This project is not a "hello world"-style project. You should explore the foundational concepts of the FFM API,
+Note: This project is not a "hello world"-style project. You should explore the foundational concepts of the FFM API,
 `jextract`, and Gradle by some other means.
 
 
@@ -47,10 +45,18 @@ Follow these instructions to build and run the program.
     * It should look something like this:
       ```text
       $ build/install/memory-leak/bin/memory-leak
-      (Not yet fully implemented)
-      Let's call native code from Java! Here we go...
-      The C function returned 123.
+      This program will compute the size/lines of all regular files in a given directory. But it does it in a cool way because it calls C library using the Foreign Function and Memory API!
+      Enter a directory (or 'exit'):
       ```
+    * Enter a directory to scan. Try `build`, `.` (current dir), `..` (parent dir), etc.
+    * Check how much memory is used by the process using the following command.
+    * ```shell
+      ps aux | grep 'java' | grep 'memory_leak' | awk '{print $6/1024 " MiB"}'
+      ```
+    * For me, it was 65MiB after I scanned a few directories. We can't tell if this is just normal JVM memory usage
+      or if we have a memory leak.
+    * Scan some more and check the memory usage again.
+    * For me, it was 117MiB. There's a memory leak! Check the code and plug the leak.
 
 
 ## Wish List
@@ -71,7 +77,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
 * [ ] IN PROGRESS Turn this into a 'memory-leak' subproject which shows an example memory leak. The idea is that when calling a C
   library, you still need to explicitly manage the memory allocated by the C functions. FFM API does not save you from
   this burden. Specifically, I'll implement a commandline program that reads a line-count for a file using C code. But
-  the function keeps the read content in-memory and it's up to the caller to free it. You should be able to see, in
+  the function keeps the read content in-memory, and it's up to the caller to free it. You should be able to see, in
   Activity Manager, that the process is using more and more memory. As an aside, does the JVM have any idea how much
   off-heap memory is used? I would guess not, but maybe it calls into OS functions to get total memory used?
   * DONE Rename
@@ -80,7 +86,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
   * DONE From Java, read an entire directory
   * DONE Create a `free` helper function for the file_data struct
   * DONE Allow user to enter a directory path as a commandline argument. This is the 'read' command.
-  * Showcase the memory issue.
+  * DONE Showcase the memory issue.
   * Offer a 'read-safe' command which actually frees the memory
-  * (stretch) Can a Java program see how much memory (including non-JVM) memory is used?
+  * NOT POSSIBLE (answer: no it can't see memory allocated from third party code like what I'm doing) Can a Java program see how much memory (including non-JVM/native) memory is used?
 * [ ] Defect. My program is not counting the same bytes as `dust`. Not sure why yet.
