@@ -33,6 +33,7 @@ Follow these instructions to build and run the program.
        -l "$PWD/readfile.dylib" \
       readfile.h
       ```
+    * This is only necessary when the C library ABI changes. The binding code (Java) is already in version control.
 5. Compile the Java program distribution
     * ```shell
       ./gradlew installDist
@@ -55,7 +56,7 @@ Follow these instructions to build and run the program.
       ```
     * For me, it was 65MiB after I scanned a few directories. We can't tell if this is just normal JVM memory usage
       or if we have a memory leak.
-    * Scan some more and check the memory usage again.
+    * Scan some more (or a lot more) and check the memory usage again.
     * For me, it was 117MiB. That's too high, there must be a memory leak! Check the code and plug the leak.
 
 
