@@ -1,6 +1,6 @@
 # java-foreign-function-and-memory-api-playground
 
-📚 Learning and exploring "off-heap" memory segments using Java's foreign memory API.
+📚 Learning and exploring Java's Foreign Function and Memory (FFM) API.
 
 
 ## Overview
