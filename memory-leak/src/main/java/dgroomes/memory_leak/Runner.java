@@ -93,6 +93,10 @@ public class Runner {
                     fileSummary.lines += file_data.lines$get(fileData);
                     fileSummary.bytes += file_data.bytes$get(fileData);
 
+                    // Now that we've extracted the data we need from the C struct, we need to free the memory related
+                    // to the struct. But, this line is purposely commented out to demonstrate the memory leak.
+                    // readfile_h.free_file_data(fileData);
+
                     return FileVisitResult.CONTINUE;
                 }
             });

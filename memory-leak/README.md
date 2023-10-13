@@ -74,7 +74,7 @@ General clean-ups, TODOs and things I wish to implement for this project:
      alternative memory allocators beside `malloc`, like `jemalloc`, but that's just not a thing. So, what you have to do
      is call back into the C library which needs to expose a function that frees the memory. So, integrating to foreign
      functions absolute exposes you to classic C memory management problems. But, that's just trade off.
-* [ ] IN PROGRESS Turn this into a 'memory-leak' subproject which shows an example memory leak. The idea is that when calling a C
+* [x] DONE Turn this into a 'memory-leak' subproject which shows an example memory leak. The idea is that when calling a C
   library, you still need to explicitly manage the memory allocated by the C functions. FFM API does not save you from
   this burden. Specifically, I'll implement a commandline program that reads a line-count for a file using C code. But
   the function keeps the read content in-memory, and it's up to the caller to free it. You should be able to see, in
@@ -87,6 +87,6 @@ General clean-ups, TODOs and things I wish to implement for this project:
   * DONE Create a `free` helper function for the file_data struct
   * DONE Allow user to enter a directory path as a commandline argument. This is the 'read' command.
   * DONE Showcase the memory issue.
-  * Offer a 'read-safe' command which actually frees the memory
+  * DONE Include the free the invocation to prove the correct way to manage the memory. 
   * NOT POSSIBLE (answer: no it can't see memory allocated from third party code like what I'm doing) Can a Java program see how much memory (including non-JVM/native) memory is used?
 * [ ] Defect. My program is not counting the same bytes as `dust`. Not sure why yet.
